@@ -17,8 +17,21 @@ def reformat_date(dates):
     reformated_dates = []
 
     for item in dates:
+        # Check type explicitly
+        if not isinstance(item, str):
+            raise TypeError(f'Expected string, got {type(item).__name__}')
+
+        # Fix Whitespace
+        item = item.strip()
+
         day, month, year = item.split(' ')
         day_numbers = re.compile(r'\d+')
+
+        # Fix wrong patterns such as '23rdx'
+        suffix = re.sub(r'\d+', '', day)
+        if suffix not in ('st', 'nd', 'rd', 'th'):
+            raise ValueError(f"Invalid day suffix: '{suffix}'")
+
         day = day_numbers.findall(day)[0]
         formatted_date = datetime.datetime.strptime(f'{year}-{month}-{day}',
                                                     '%Y-%b-%d')
